@@ -5,14 +5,8 @@ import React from 'react';
 import { ConfigProvider } from 'antd';
 
 import moment from 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs';
-import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/bn-bd';
 import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/en';
-import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/fa';
-import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/id';
-import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/ja';
-import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/pt-br';
 import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/zh-cn';
-import 'C:/Users/grant.fan/Code/React/React-Ant/node_modules/dayjs/locale/zh-tw';
 import { RawIntlProvider, getLocale, getDirection , setIntl, getIntl, localeInfo, event, LANG_CHANGE_EVENT } from './localeExports';
 
 

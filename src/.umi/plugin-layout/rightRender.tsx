@@ -23,7 +23,7 @@ export function getRightRenderContent (opts: {
 
   const avatar = (
     <span className="umi-plugin-layout-action">
-        <Avatar
+        {/* <Avatar
           size="small"
           className="umi-plugin-layout-avatar"
           src={
@@ -31,8 +31,8 @@ export function getRightRenderContent (opts: {
             'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png'
           }
           alt="avatar"
-        />
-        <span className="umi-plugin-layout-name">{opts.initialState?.name}</span>
+        /> */}
+        {/* <span className="umi-plugin-layout-name">{opts.initialState?.name}</span> */}
       </span>
   );
 

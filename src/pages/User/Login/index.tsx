@@ -39,9 +39,9 @@ const ActionIcons = () => {
 
   return (
     <>
-      <AlipayCircleOutlined key="AlipayCircleOutlined" className={langClassName} />
+      {/* <AlipayCircleOutlined key="AlipayCircleOutlined" className={langClassName} />
       <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={langClassName} />
-      <WeiboCircleOutlined key="WeiboCircleOutlined" className={langClassName} />
+      <WeiboCircleOutlined key="WeiboCircleOutlined" className={langClassName} /> */}
     </>
   );
 };
