@@ -11,7 +11,8 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
+// import { Button, Drawer, Input, message } from 'antd';
+import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -89,6 +90,14 @@ const TableList: React.FC = () => {
    * @zh-CN 新建窗口的弹窗
    *  */
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
+
+  const [open, setOpen] = useState(false);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
   /**
    * @en-US The pop-up window of the distribution update window
    * @zh-CN 分布更新窗口的弹窗
@@ -112,11 +121,11 @@ const TableList: React.FC = () => {
       title: (
         <FormattedMessage
           id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="Rule name"
+          defaultMessage="Index"
         />
       ),
       dataIndex: 'name',
-      tip: 'The rule name is the unique key',
+      tip: 'The Package SKU is the unique key',
       render: (dom, entity) => {
         return (
           <a
@@ -131,15 +140,15 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
+      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Package SKU" />,
       dataIndex: 'desc',
       valueType: 'textarea',
     },
     {
       title: (
         <FormattedMessage
-          id="pages.searchTable.titleCallNo"
-          defaultMessage="Number of service calls"
+          id="pages.searchTable.modified"
+          // defaultMessage="SKU"
         />
       ),
       dataIndex: 'callNo',
@@ -151,8 +160,67 @@ const TableList: React.FC = () => {
           defaultMessage: ' 万 ',
         })}`,
     },
+   
     {
-      title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
+      title: (
+        <FormattedMessage
+          id="pages.searchTable.startDate"
+          // defaultMessage="Last scheduled time"
+        />
+      ),
+      sorter: true,
+      dataIndex: 'updatedAt',
+      valueType: 'dateTime',
+      renderFormItem: (item, { defaultRender, ...rest }, form) => {
+        const status = form.getFieldValue('status');
+        if (`${status}` === '0') {
+          return false;
+        }
+        if (`${status}` === '3') {
+          return (
+            <Input
+              {...rest}
+              placeholder={intl.formatMessage({
+                id: 'pages.searchTable.exception',
+                defaultMessage: 'Please enter the reason for the exception!',
+              })}
+            />
+          );
+        }
+        return defaultRender(item);
+      },
+    },
+    {
+      title: (
+        <FormattedMessage
+          id="pages.searchTable.endDate"
+          // defaultMessage="Last scheduled time"
+        />
+      ),
+      sorter: true,
+      dataIndex: 'updatedAt',
+      valueType: 'dateTime',
+      renderFormItem: (item, { defaultRender, ...rest }, form) => {
+        const status = form.getFieldValue('status');
+        if (`${status}` === '0') {
+          return false;
+        }
+        if (`${status}` === '3') {
+          return (
+            <Input
+              {...rest}
+              placeholder={intl.formatMessage({
+                id: 'pages.searchTable.exception',
+                defaultMessage: 'Please enter the reason for the exception!',
+              })}
+            />
+          );
+        }
+        return defaultRender(item);
+      },
+    },
+    {
+      title: <FormattedMessage id="pages.searchTable.skuType" defaultMessage="Status" />,
       dataIndex: 'status',
       hideInForm: true,
       valueEnum: {
@@ -189,32 +257,40 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last scheduled time"
-        />
-      ),
-      sorter: true,
-      dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
+      title: <FormattedMessage id="pages.searchTable.type" defaultMessage="Status" />,
+      dataIndex: 'status',
+      hideInForm: true,
+      valueEnum: {
+        0: {
+          text: (
+            <FormattedMessage
+              id="pages.searchTable.nameStatus.default"
+              defaultMessage="Shut down"
             />
-          );
-        }
-        return defaultRender(item);
+          ),
+          status: 'Default',
+        },
+        1: {
+          text: (
+            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
+          ),
+          status: 'Processing',
+        },
+        2: {
+          text: (
+            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
+          ),
+          status: 'Success',
+        },
+        3: {
+          text: (
+            <FormattedMessage
+              id="pages.searchTable.nameStatus.abnormal"
+              defaultMessage="Abnormal"
+            />
+          ),
+          status: 'Error',
+        },
       },
     },
     {
@@ -241,6 +317,31 @@ const TableList: React.FC = () => {
     },
   ];
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const contents = e.target.result;
+        const lines = contents.split('\n');
+        const data = [];
+
+        lines.forEach((line) => {
+          const row = line.split(',');
+          data.push(row);
+        });
+
+        console.log('CSV data:', data);
+
+        // Now, you can send 'data' to your server or process it further
+      };
+
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <PageContainer>
       <ProTable<API.RuleListItem, API.PageParams>
@@ -254,14 +355,22 @@ const TableList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+          // <Button
+          //   type="primary"
+          //   key="primary"
+          //   onClick={() => {
+          //     handleModalOpen(true);
+          //   }}
+          // >
+            
+          //   <PlusOutlined /> 
+          //   <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+          // </Button>,
+           <Button type="primary"   key="primary" 
+               onClick={showDrawer}         
+            >            
+              <PlusOutlined /> 
+              <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
         request={rule}
@@ -311,12 +420,14 @@ const TableList: React.FC = () => {
           </Button>
         </FooterToolbar>
       )}
+
+
       <ModalForm
         title={intl.formatMessage({
           id: 'pages.searchTable.createForm.newRule',
           defaultMessage: 'New rule',
         })}
-        width="400px"
+        width="600px"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
@@ -336,7 +447,7 @@ const TableList: React.FC = () => {
               message: (
                 <FormattedMessage
                   id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
+                  defaultMessage="Package SKU is required"
                 />
               ),
             },
@@ -346,7 +457,9 @@ const TableList: React.FC = () => {
         />
         <ProFormTextArea width="md" name="desc" />
       </ModalForm>
-      <UpdateForm
+      
+
+      {/* <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
           if (success) {
@@ -365,10 +478,10 @@ const TableList: React.FC = () => {
         }}
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
-      />
+      /> */}
 
-      <Drawer
-        width={600}
+      {/* <Drawer
+        width={800}
         open={showDetail}
         onClose={() => {
           setCurrentRow(undefined);
@@ -389,7 +502,88 @@ const TableList: React.FC = () => {
             columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
           />
         )}
+      </Drawer> */}
+
+
+      <Drawer
+        title="SKU List Upload"
+        width={720}
+        onClose={onClose}
+        open={open}
+        styles={{
+          body: {
+            paddingBottom: 80,
+          },
+        }}
+        extra={
+          <Space>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose} type="primary">
+              Submit
+            </Button>
+          </Space>
+        }
+      >
+        <Form layout="vertical" hideRequiredMark>
+          <Row gutter={16}>           
+            
+          </Row>
+          <Row gutter={16}>            
+            <Col span={12}>
+              <Form.Item
+                name="type"
+                label="Type"
+                rules={[{ required: true, message: 'Please choose the type' }]}
+              >
+                <Select placeholder="Please choose the type">
+                  <Option value="private">Clearance</Option>
+                  <Option value="public">Promotion</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>           
+            <Col span={12}>
+              <Form.Item
+                name="dateTime"
+                label="DateTime"
+                rules={[{ required: true, message: 'Please choose the dateTime' }]}
+              >
+                <DatePicker.RangePicker
+                  style={{ width: '100%' }}
+                  getPopupContainer={(trigger) => trigger.parentElement!}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                name="description"
+                label="Description"
+                rules={[
+                  {
+                    required: true,
+                    message: 'please enter url description',
+                  },
+                ]}
+              >
+                <Input.TextArea rows={4} placeholder="please enter url description" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <div>
+                <input type="file" accept=".csv" onChange={handleFileUpload} />
+              </div>              
+            </Col>
+          </Row>
+
+
+        </Form>
       </Drawer>
+
     </PageContainer>
   );
 };
